@@ -104,16 +104,19 @@ def main(page: ft.Page):
     global arbol_servicios
     arbol_servicios = ArbolServicios()
 
-    # Crear servicios
-    servicio1 = NodoServicio("Servicio1", "Descripción del servicio 1")
-    arbol_servicios.agregar_servicio(servicio1)
+    # Crear servicio "Préstamos" y agregarlo al árbol
+    prestamos = arbol_servicios.agregar_servicio("Préstamos", "Descripción del servicio de préstamos")
+    
+    # Crear subservicios para "Préstamos"
+    prestamos_hipotecarios = NodoServicio("Préstamos Hipotecarios", "Subservicio de préstamos hipotecarios")
+    prestamos_viajes = NodoServicio("Préstamos de Viajes", "Subservicio de préstamos para viajes")
+    
+    # Agregar los subservicios a "Préstamos"
+    prestamos.agregar_subservicio(prestamos_hipotecarios)
+    prestamos.agregar_subservicio(prestamos_viajes)
 
-    servicio2 = NodoServicio("Servicio2", "Descripción del servicio 2")
-    arbol_servicios.agregar_servicio(servicio2)
-
-    # Crear subservicios para el primer servicio
-    subservicio1 = NodoServicio("Subservicio1", "Descripción del subservicio 1")
-    servicio1.agregar_subservicio(subservicio1)
+    # Crear servicio "Tarjetas de Crédito" y agregarlo al árbol
+    tarjetas_credito = arbol_servicios.agregar_servicio("Tarjetas de Crédito", "Descripción del servicio de tarjetas de crédito")
 
     # Crear el menú principal pasando el árbol de servicios al Login
     MenuPrincipal(page, Registro, lambda p: Login(p, arbol_servicios)).mostrar()

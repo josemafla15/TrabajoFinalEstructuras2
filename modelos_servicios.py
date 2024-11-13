@@ -2,7 +2,7 @@ class NodoServicio:
     def __init__(self, nombre, descripcion=None):
         self.nombre = nombre
         self.descripcion = descripcion
-        self.subservicios = []
+        self.subservicios = []  # Lista para los subservicios
 
     def agregar_subservicio(self, subservicio):
         # Evitar duplicados
@@ -13,38 +13,27 @@ class NodoServicio:
 
 class ArbolServicios:
     def __init__(self):
-        self.raiz = NodoServicio("Servicios")  # Raíz general para todos los servicios
+        self.raiz = NodoServicio("Servicios")
         self.servicios = []
 
-    def agregar_servicio(self, nombre_servicio, nombre_subservicio=None):
-        # Si no se pasa un subservicio, se agrega un nuevo servicio principal
-        nuevo_servicio = NodoServicio(nombre_servicio)
-        
-        # Si el servicio tiene un subservicio
-        if nombre_subservicio is None:
-            self.servicios.append(nuevo_servicio)
-        else:
-            # Buscar si el servicio ya existe, en cuyo caso se agrega un subservicio
-            for servicio in self.servicios:
-                if servicio.nombre == nombre_servicio:
-                    servicio.agregar_subservicio(NodoServicio(nombre_subservicio))
-                    return
-            # Si no existe el servicio principal, lo agregamos junto con su subservicio
-            nuevo_servicio.agregar_subservicio(NodoServicio(nombre_subservicio))
-            self.servicios.append(nuevo_servicio)
+    def agregar_servicio(self, nombre_servicio, descripcion=None):
+        # Agregar un servicio a la lista
+        nuevo_servicio = NodoServicio(nombre_servicio, descripcion)
+        self.servicios.append(nuevo_servicio)
+        return nuevo_servicio  # Devuelve el servicio recién creado para poder agregarle subservicios
 
     def obtener_lista_servicios(self):
         lista_servicios = []
-        
-        # Agregar todos los servicios y subservicios
         for servicio in self.servicios:
-            lista_servicios.append(servicio.nombre)  # Servicio principal
+            lista_servicios.append(servicio.nombre)  # Solo el nombre
             for subservicio in servicio.subservicios:
-                lista_servicios.append(f"  - {subservicio.nombre}")  # Subservicio con sangría
+                lista_servicios.append(f"{servicio.nombre} > {subservicio.nombre}")  # Incluye subservicios
         return lista_servicios
 
 # Ejemplo de uso
 arbol_servicios = ArbolServicios()
+
+# Crear servicios y subservicios
 arbol_servicios.agregar_servicio("Servicio1", "Subservicio1")
 arbol_servicios.agregar_servicio("Servicio1", "Subservicio2")
 arbol_servicios.agregar_servicio("Servicio2")
