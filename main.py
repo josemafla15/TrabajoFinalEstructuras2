@@ -6,6 +6,7 @@ from ventana_bienvenida import VentanaBienvenida
 from ventana_servicios import VentanaServicios
 from modelos_servicios import ArbolServicios, NodoServicio
 
+# Clase de Registro
 class Registro:
     def __init__(self, page):
         self.page = page
@@ -41,12 +42,13 @@ class Registro:
         self.page.update()
 
     def volver_menu(self, e):
-        MenuPrincipal(self.page, Registro, Login).mostrar()
+        # Usamos lambda para pasar el arbol de servicios correctamente al Login
+        MenuPrincipal(self.page, Registro, lambda p: Login(p, arbol_servicios)).mostrar()
 
 class Login:
-    def __init__(self, page):
+    def __init__(self, page, arbol_servicios):
         self.page = page
-        self.arbol_servicios = ArbolServicios()  # Instancia del árbol de servicios
+        self.arbol_servicios = arbol_servicios  # Instancia del árbol de servicios
         self.id_input = ft.TextField(label="ID de Usuario", width=200)
         self.contraseña_input = ft.TextField(label="Contraseña", password=True, width=200)
         self.mensajes = ft.Column()
@@ -77,7 +79,8 @@ class Login:
         self.page.update()
 
     def redirigir_a_menu_opciones(self):
-        menu_opciones = MenuOpciones(self.page, self.manejar_clientes, self.manejar_sucursales, self.manejar_servicios)
+        # Ahora solo pasamos los métodos para manejar clientes y sucursales
+        menu_opciones = MenuOpciones(self.page, self.manejar_clientes, self.manejar_sucursales)
         menu_opciones.mostrar()
 
     def manejar_clientes(self, e):
@@ -87,19 +90,18 @@ class Login:
     def manejar_sucursales(self, e):
         print("Opción de sucursales seleccionada.")
 
-    def manejar_servicios(self, e):
-        ventana_servicios = VentanaServicios(self.page)
-        ventana_servicios.mostrar()
-
     def volver_menu(self, e):
-        MenuPrincipal(self.page, Registro, Login).mostrar()
+        # Usamos lambda para pasar el arbol de servicios correctamente al Login
+        MenuPrincipal(self.page, Registro, lambda p: Login(p, self.arbol_servicios)).mostrar()
 
+# Función principal
 def main(page: ft.Page):
     page.title = "Sistema de Registro y Login"
     page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     
     # Crear y agregar servicios al árbol
+    global arbol_servicios
     arbol_servicios = ArbolServicios()
 
     # Crear servicios
@@ -113,6 +115,7 @@ def main(page: ft.Page):
     subservicio1 = NodoServicio("Subservicio1", "Descripción del subservicio 1")
     servicio1.agregar_subservicio(subservicio1)
 
-    MenuPrincipal(page, Registro, Login).mostrar()
+    # Crear el menú principal pasando el árbol de servicios al Login
+    MenuPrincipal(page, Registro, lambda p: Login(p, arbol_servicios)).mostrar()
 
 ft.app(target=main)

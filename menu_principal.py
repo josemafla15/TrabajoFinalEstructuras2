@@ -1,28 +1,20 @@
 import flet as ft
 
 class MenuPrincipal:
-    def __init__(self, page, registro_cls, login_cls):
+    def __init__(self, page, registro_cls, login_factory):
         self.page = page
         self.registro_cls = registro_cls
-        self.login_cls = login_cls
+        self.login_factory = login_factory
 
     def mostrar(self):
         self.page.clean()
         self.page.add(
             ft.Column(
                 [
-                    ft.Text("Bienvenido al Sistema", size=24, weight=ft.FontWeight.BOLD),
-                    ft.ElevatedButton("Registrar nuevo usuario", on_click=self.abrir_registro),
-                    ft.ElevatedButton("Iniciar sesión", on_click=self.abrir_login),
-                ],
-                alignment=ft.MainAxisAlignment.CENTER,
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    ft.Text("Menú Principal", size=20, weight=ft.FontWeight.BOLD),
+                    ft.ElevatedButton("Registro de Usuario", on_click=lambda e: self.registro_cls(self.page).mostrar()),
+                    ft.ElevatedButton("Iniciar Sesión", on_click=lambda e: self.login_factory(self.page).mostrar()),
+                ]
             )
         )
         self.page.update()
-
-    def abrir_registro(self, e):
-        self.registro_cls(self.page).mostrar()
-
-    def abrir_login(self, e):
-        self.login_cls(self.page).mostrar()

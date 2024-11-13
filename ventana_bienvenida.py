@@ -1,66 +1,87 @@
 import flet as ft
-from modelos_servicios import ArbolServicios, NodoServicio
+from cliente import Cliente
+from gestor_cliente import GestorCliente
 
 class VentanaBienvenida:
-    def __init__(self, page: ft.Page, arbol_servicios: ArbolServicios):
+    def __init__(self, page, arbol_servicios):
         self.page = page
-        self.page.clean()
-        self.page.title = "Bienvenido al Sistema Bancario"
         self.arbol_servicios = arbol_servicios
-
-        # Elementos de la interfaz
-        self.id_input = ft.TextField(label="ID Cliente", width=150)
-        self.nombre_input = ft.TextField(label="Nombre Cliente", width=200)
-        self.prioritario_checkbox = ft.Checkbox(label="¿Es prioritario?")
-        self.servicio_input = ft.TextField(label="Tipo de Servicio", width=200)  # Campo de texto para servicio
+        self.gestor_cliente = GestorCliente()  # Crear una instancia de GestorCliente
+        self.cliente_input = ft.TextField(label="Nombre del Cliente", width=200)
+        self.id_input = ft.TextField(label="ID del Cliente", width=200)
+        self.es_prioritario_checkbox = ft.Checkbox(label="Cliente Prioritario")  # Checkbox para cliente prioritario
+        self.servicio_input = ft.Dropdown(label="Seleccione un Servicio", width=200)
         self.mensajes = ft.Column()
-        self.agregar_button = ft.ElevatedButton("Agregar Cliente", on_click=self.agregar_cliente)
-        self.atender_button = ft.ElevatedButton("Atender Cliente", on_click=self.atender_cliente)
 
-        # Layout
-        self.page.add(
-            ft.Row([ 
-                ft.Column([
-                    self.id_input,
-                    self.nombre_input,
-                    self.prioritario_checkbox,
-                    self.servicio_input,  # Mostrar el campo de texto para servicio
-                    self.agregar_button,
-                    self.atender_button
-                ], width=300),
-                ft.Column([self.mensajes], width=400)
-            ])
-        )
+        # Cargar los servicios disponibles en el dropdown
+        self.cargar_servicios()
 
-        # Cargar servicios disponibles en el mensaje
-        if self.arbol_servicios.servicios:
-            self.mensajes.controls.append(ft.Text("Servicios disponibles:"))
-            for servicio in self.arbol_servicios.servicios:
-                self.mensajes.controls.append(ft.Text(f"- {servicio.nombre}"))
-        else:
-            self.mensajes.controls.append(ft.Text("No hay servicios disponibles.", color="red"))
+    def cargar_servicios(self):
+        # Limpiar el dropdown
+        self.servicio_input.options.clear()
+
+        # Cargar servicios del árbol en el dropdown
+        for servicio in self.arbol_servicios.obtener_lista_servicios():
+            self.servicio_input.options.append(ft.dropdown.Option(servicio))
 
         self.page.update()
 
     def mostrar(self):
+        self.page.clean()
+        self.page.add(
+            ft.Column(
+                [
+                    ft.Text("Bienvenido a la Gestión de Clientes", size=20, weight=ft.FontWeight.BOLD),
+                    self.cliente_input,
+                    self.id_input,
+                    self.es_prioritario_checkbox,  # Agregar checkbox a la interfaz
+                    self.servicio_input,
+                    ft.ElevatedButton("Agregar Cliente", on_click=self.agregar_cliente),
+                    ft.ElevatedButton("Atender Cliente", on_click=self.atender_cliente),
+                    self.mensajes,
+                ]
+            )
+        )
         self.page.update()
 
     def agregar_cliente(self, e):
-        id_cliente = self.id_input.value
-        nombre_cliente = self.nombre_input.value
-        es_prioritario = self.prioritario_checkbox.value
-        tipo_servicio = self.servicio_input.value
+        nombre_cliente = self.cliente_input.value.strip()  # Eliminar espacios extras
+        id_cliente = self.id_input.value.strip()  # Eliminar espacios extras
+        es_prioritario = self.es_prioritario_checkbox.value  # Obtener el estado del checkbox
+        servicio_seleccionado = self.servicio_input.value
 
-        # Validar que el servicio ingresado esté en la lista de servicios
-        servicio = next((s for s in self.arbol_servicios.servicios if s.nombre.lower() == tipo_servicio.lower()), None)
+        if nombre_cliente and id_cliente:
+            cliente = Cliente(nombre_cliente, id_cliente, es_prioritario)
+            if servicio_seleccionado:
+                cliente.servicio = servicio_seleccionado  # Asignar servicio al cliente
 
-        if servicio:
-            self.mensajes.controls.append(ft.Text(f"Cliente {nombre_cliente} agregado con servicio {servicio.nombre}."))
+            # Usamos el gestor_cliente para agregar al cliente en la cola o pila
+            self.gestor_cliente.agregar_cliente(cliente)
+
+            # Limpiar campos después de agregar el cliente
+            self.cliente_input.value = ""
+            self.id_input.value = ""
+            self.es_prioritario_checkbox.value = False  # Desmarcar el checkbox
+            self.servicio_input.value = None
+
+            self.mensajes.controls.append(
+                ft.Text(f"Cliente {nombre_cliente} agregado con ID {id_cliente}.", color="green")
+            )
         else:
-            self.mensajes.controls.append(ft.Text("Servicio no encontrado. Intente nuevamente.", color="red"))
+            self.mensajes.controls.append(ft.Text("Por favor, ingrese el nombre y el ID del cliente.", color="red"))
 
         self.page.update()
 
     def atender_cliente(self, e):
-        self.mensajes.controls.append(ft.Text("Atendiendo al cliente..."))
+        cliente = self.gestor_cliente.atender_cliente()  # Obtener el cliente que será atendido
+
+        if cliente:
+            self.mensajes.controls.append(
+                ft.Text(f"Cliente {cliente.nombre} atendido. Servicio seleccionado: {cliente.servicio}.", color="green")
+            )
+        else:
+            self.mensajes.controls.append(
+                ft.Text("No hay clientes en espera.", color="red")
+            )
+        
         self.page.update()
