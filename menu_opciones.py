@@ -1,6 +1,8 @@
 import flet as ft
 from ventana_bienvenida import VentanaBienvenida
 
+import sys  # Necesario para usar sys.exit()
+
 class MenuOpciones:
     def __init__(self, page, manejar_clientes, manejar_sucursales):
         self.page = page
@@ -22,5 +24,4 @@ class MenuOpciones:
         self.page.update()
 
     def salir(self, e):
-        print("Salir del sistema")
-        self.page.quit()
+        self.page.window_close()

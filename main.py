@@ -5,6 +5,8 @@ from menu_opciones import MenuOpciones
 from ventana_bienvenida import VentanaBienvenida
 from ventana_servicios import VentanaServicios
 from modelos_servicios import ArbolServicios, NodoServicio
+from grafoSucursales import GrafoSucursales
+from ventana_sucursales import VentanaSucursales
 
 # Clase de Registro
 class Registro:
@@ -43,12 +45,13 @@ class Registro:
 
     def volver_menu(self, e):
         # Usamos lambda para pasar el arbol de servicios correctamente al Login
-        MenuPrincipal(self.page, Registro, lambda p: Login(p, arbol_servicios)).mostrar()
+        MenuPrincipal(self.page, Registro, lambda p: Login(p, arbol_servicios, grafo_sucursales)).mostrar()
 
 class Login:
-    def __init__(self, page, arbol_servicios):
+    def __init__(self, page, arbol_servicios, grafo_sucursales):
         self.page = page
         self.arbol_servicios = arbol_servicios  # Instancia del árbol de servicios
+        self.grafo_sucursales = grafo_sucursales  # Instancia del grafo de sucursales
         self.id_input = ft.TextField(label="ID de Usuario", width=200)
         self.contraseña_input = ft.TextField(label="Contraseña", password=True, width=200)
         self.mensajes = ft.Column()
@@ -79,7 +82,7 @@ class Login:
         self.page.update()
 
     def redirigir_a_menu_opciones(self):
-        # Ahora solo pasamos los métodos para manejar clientes y sucursales
+        # Pasamos las funciones para gestionar clientes y sucursales
         menu_opciones = MenuOpciones(self.page, self.manejar_clientes, self.manejar_sucursales)
         menu_opciones.mostrar()
 
@@ -88,11 +91,12 @@ class Login:
         ventana_bienvenida.mostrar()
 
     def manejar_sucursales(self, e):
-        print("Opción de sucursales seleccionada.")
+        ventana_sucursales = VentanaSucursales(self.page, self.grafo_sucursales)
+        ventana_sucursales.mostrar()
 
     def volver_menu(self, e):
-        # Usamos lambda para pasar el arbol de servicios correctamente al Login
-        MenuPrincipal(self.page, Registro, lambda p: Login(p, self.arbol_servicios)).mostrar()
+        # Usamos lambda para pasar el arbol de servicios y el grafo al Login
+        MenuPrincipal(self.page, Registro, lambda p: Login(p, self.arbol_servicios, self.grafo_sucursales)).mostrar()
 
 # Función principal
 def main(page: ft.Page):
@@ -118,7 +122,11 @@ def main(page: ft.Page):
     # Crear servicio "Tarjetas de Crédito" y agregarlo al árbol
     tarjetas_credito = arbol_servicios.agregar_servicio("Tarjetas de Crédito", "Descripción del servicio de tarjetas de crédito")
 
-    # Crear el menú principal pasando el árbol de servicios al Login
-    MenuPrincipal(page, Registro, lambda p: Login(p, arbol_servicios)).mostrar()
+    # Crear el grafo de sucursales
+    global grafo_sucursales
+    grafo_sucursales = GrafoSucursales()
+
+    # Crear el menú principal pasando el árbol de servicios y el grafo al Login
+    MenuPrincipal(page, Registro, lambda p: Login(p, arbol_servicios, grafo_sucursales)).mostrar()
 
 ft.app(target=main)
