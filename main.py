@@ -91,7 +91,12 @@ class Login:
         ventana_bienvenida.view()
 
     def manage_branches(self, e):
-        ventana_sucursales = VentanaSucursales(self.page, self.grafo_sucursales)
+        ventana_sucursales = VentanaSucursales(
+            self.page,
+            self.grafo_sucursales,
+            self.manage_clients,  # Método para gestionar clientes
+            self.manage_branches  # Método para gestionar sucursales
+        )
         ventana_sucursales.view()
 
     def volver_menu(self, e):

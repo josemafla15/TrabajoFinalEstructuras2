@@ -1,13 +1,16 @@
 import flet as ft
 from grafoSucursales import GrafoSucursales
+from menu_opciones import *
 
 class VentanaSucursales:
-    def __init__(self, page, grafo_sucursales):
+    def __init__(self, page, grafo_sucursales, manage_clients, manage_branches):
         self.page = page
         self.grafo_sucursales = grafo_sucursales
+        self.manage_clients = manage_clients
+        self.manage_branches = manage_branches
 
         # Controles de la interfaz
-        self.sucursal_input = ft.TextField(label="name de la Sucursal", width=200)
+        self.sucursal_input = ft.TextField(label="Nombre de la Sucursal", width=200)
         self.sucursal1_input = ft.Dropdown(label="Sucursal 1", width=200)
         self.sucursal2_input = ft.Dropdown(label="Sucursal 2", width=200)
         self.distancia_input = ft.TextField(label="Distancia (km)", width=200)
@@ -36,7 +39,8 @@ class VentanaSucursales:
                     self.sucursal2_input,
                     self.distancia_input,
                     ft.ElevatedButton("Conectar Sucursales", on_click=self.conect_branches),
-                    ft.ElevatedButton("view Conexiones", on_click=self.view_conexiones),
+                    ft.ElevatedButton("Ver Conexiones", on_click=self.view_conexiones),
+                    ft.ElevatedButton("Volver al Menú", on_click=self.volver_menu),
                     self.messages,
                 ]
             )
@@ -52,7 +56,7 @@ class VentanaSucursales:
             else:
                 self.messages.controls.append(ft.Text(f"La sucursal '{name_sucursal}' ya existe.", color="red"))
         else:
-            self.messages.controls.append(ft.Text("El name de la sucursal no puede estar vacío.", color="red"))
+            self.messages.controls.append(ft.Text("El nombre de la sucursal no puede estar vacío.", color="red"))
         self.page.update()
 
     def conect_branches(self, e):
@@ -82,3 +86,8 @@ class VentanaSucursales:
             for vecino, distancia in vecinos.items():
                 self.messages.controls.append(ft.Text(f"{sucursal} -> {vecino}: {distancia} km", color="blue"))
         self.page.update()
+
+    def volver_menu(self, e):
+        # Redirigir al menú principal
+        menu_opciones = MenuOpciones(self.page, self.manage_clients, self.manage_branches)
+        menu_opciones.view()
