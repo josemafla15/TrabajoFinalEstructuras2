@@ -4,19 +4,19 @@ from ventana_bienvenida import VentanaBienvenida
 import sys  # Necesario para usar sys.exit()
 
 class MenuOpciones:
-    def __init__(self, page, manejar_clientes, manejar_sucursales):
+    def __init__(self, page, manage_clients, manage_branches):
         self.page = page
-        self.manejar_clientes = manejar_clientes
-        self.manejar_sucursales = manejar_sucursales
+        self.manage_clients = manage_clients
+        self.manage_branches = manage_branches
 
-    def mostrar(self):
+    def view(self):
         self.page.clean()
         self.page.add(
             ft.Column(
                 [
                     ft.Text("Menú de Opciones", size=20, weight=ft.FontWeight.BOLD),
-                    ft.ElevatedButton("Gestionar Clientes", on_click=self.manejar_clientes),
-                    ft.ElevatedButton("Gestionar Sucursales", on_click=self.manejar_sucursales),
+                    ft.ElevatedButton("Gestionar Clientes", on_click=self.manage_clients),
+                    ft.ElevatedButton("Gestionar Sucursales", on_click=self.manage_branches),
                     ft.ElevatedButton("Salir", on_click=self.salir),
                 ]
             )

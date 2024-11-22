@@ -1,9 +1,9 @@
 class Cliente:
-    def __init__(self, nombre, id_cliente, es_prioritario=False):
-        self.nombre = nombre
-        self.id_cliente = id_cliente
-        self.es_prioritario = es_prioritario
-        self.servicios = []
+    def __init__(self, name, id_client, is_prioritary=False):
+        self.name = name
+        self.id_client = id_client
+        self.is_prioritary = is_prioritary
+        self.services = []
 
-    def agregar_servicio(self, servicio):
-        self.servicios.append(servicio)
+    def append_service(self, service):
+        self.services.append(service)
